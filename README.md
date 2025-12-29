@@ -2,8 +2,6 @@
 
 *A minimalist 16-bit operating system written in x86 assembly*
 
-[Features](#features) • [Getting Started](#getting-started) • [Usage](#usage) • [Commands](#commands) • [Contributing](#contributing)
-
 ---
 
 ## 📋 Overview
