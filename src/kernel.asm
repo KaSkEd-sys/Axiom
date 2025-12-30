@@ -355,17 +355,17 @@ print_hex:
     call print_char
     ret
 
-welcome_msg db '=== KaskedOS v1.2 alpha ===',13,10
+welcome_msg db '=== Axiom v1.2 alpha ===',13,10
              db 'type help for command list',13,10,13,10,0
-prompt_msg db '[fastuser]$kaskedos$ > ',0
+prompt_msg db '[fastuser]$Axiom$ > ',0
 unknown_msg db 'Unknown command',13,10,0
-info_msg db '<< KaskedOS x86 >>',13,10
+info_msg db '<< Axiom x86 >>',13,10
          db '16 bit operating system written by kasked',13,10,13,10,0
 time_msg db 'Time: ',0
 reboot_msg db 'Rebooting...',13,10,0
 pong_msg db 'pong!',13,10,0
-shut_msg db 'Shutting down KaskedOS x86',13,10,0
-help_msg db '<< help list KaskedOs v1.2 alpha >>',13,10
+shut_msg db 'Shutting down Axiom x86',13,10,0
+help_msg db '<< help list Axiom v1.2 alpha >>',13,10
          db 'info - shows info about system',13,10
          db 'time - shows current time',13,10
          db 'clear - clear screen',13,10
@@ -373,7 +373,7 @@ help_msg db '<< help list KaskedOs v1.2 alpha >>',13,10
          db 'ping - pong!',13,10
          db 'shut - shutting down system',13,10
          db 'opreg -[arg] - manage OS components',13,10,
-         db 'more in https://kasked-sys.github.io/kaskedocs/',13,10,0
+         db 'more in https://kasked-sys.github.io/axiomdocs/',13,10,0
 cmd_help   db 'help',0
 cmd_info   db 'info',0
 cmd_time   db 'time',0
@@ -389,7 +389,7 @@ opreg_help_msg db 'opreg - OS Components Registry',13,10
                db '  -r  read OS components status',13,10
                db '  -c  enable OS component',13,10
                db '  -d  disable OS component',13,10
-               db '  more in https://kasked-sys.github.io/kaskedocs/#opreg',13,10,13,10,0
+               db '  more in https://kasked-sys.github.io/axiomdocs/#opreg',13,10,13,10,0
 opreg_read_msg db 'OS Components Registry:',13,10,0
 opreg_change_msg db 'Component enabled successfully',13,10,0
 opreg_delete_msg db 'Component disabled successfully',13,10,0
@@ -399,12 +399,12 @@ status_enabled db 'ENABLED',13,10,0
 status_disabled db 'DISABLED',13,10,0
 
 tiger_art db '            /\\',13,10
-          db '           /  \\     fastuser@kaskedos',13,10
+          db '           /  \\     fastuser@Axiom',13,10
           db '          / /\\ \\    ---------------------',13,10
-          db '         ( (  ) )   OS: KaskedOS x86 v1.2 alpha',13,10
+          db '         ( (  ) )   OS: Axiom x86 v1.2 alpha',13,10
           db '        (  \\  / )   Kernel: 16-bit Real Mode',13,10
           db '         \\  \\/  /   Architecture: x86',13,10
-          db '          \\    /    Shell: kaskedos shell',13,10
+          db '          \\    /    Shell: Axiom shell',13,10
           db '       /\\ |  | /\\   Uptime: Since boot',13,10
           db '      /  \\|  |/  \\  ',13,10
           db '     (    \\  /    )',13,10
