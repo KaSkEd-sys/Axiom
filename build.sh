@@ -1,3 +1,4 @@
+clear
 echo "Building os..."
 
 rm -rf boot.bin

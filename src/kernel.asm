@@ -372,7 +372,8 @@ help_msg db '<< help list KaskedOs v1.2 alpha >>',13,10
          db 'reboot - rebooting system',13,10
          db 'ping - pong!',13,10
          db 'shut - shutting down system',13,10
-         db 'opreg -[arg] - manage OS components',13,10,0
+         db 'opreg -[arg] - manage OS components',13,10,
+         db 'more in https://kasked-sys.github.io/kaskedocs/',13,10,0
 cmd_help   db 'help',0
 cmd_info   db 'info',0
 cmd_time   db 'time',0
@@ -387,7 +388,8 @@ opreg_help_msg db 'opreg - OS Components Registry',13,10
                db 'Usage: opreg -[arg]',13,10
                db '  -r  read OS components status',13,10
                db '  -c  enable OS component',13,10
-               db '  -d  disable OS component',13,10,13,10,0
+               db '  -d  disable OS component',13,10
+               db '  more in https://kasked-sys.github.io/kaskedocs/#opreg',13,10,13,10,0
 opreg_read_msg db 'OS Components Registry:',13,10,0
 opreg_change_msg db 'Component enabled successfully',13,10,0
 opreg_delete_msg db 'Component disabled successfully',13,10,0
