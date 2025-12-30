@@ -15,7 +15,6 @@ start:
     mov si, boot_msg
     call print
 
-    ; загрузка kernel (8 секторов) по адресу 0000:1000
     mov bx, 0x1000
     mov ah, 0x02
     mov al, 8
