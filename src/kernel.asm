@@ -4,6 +4,7 @@
 start:
     xor ax, ax
     mov ds, ax
+    mov es, ax
 
     call clear_screen
 
@@ -330,7 +331,7 @@ print_number:
     mov bx, 10
     
     cmp ax, 0
-    jge .position
+    jge .positive
     neg ax
     push ax
     mov al, '-'
