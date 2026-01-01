@@ -43,6 +43,11 @@ main_loop:
     cmp ax, 1
     je do_ping
 
+    mov di, cmd_calc
+    call strcmp
+    cmp ax, 1
+    je do_calc
+
     mov di, cmd_shut
     call strcmp
     cmp ax, 1
@@ -120,6 +125,83 @@ do_reboot:
 do_help:
     mov si, help_msg
     call print_string
+    jmp main_loop
+
+do_calc:
+    mov si, calc_msg
+    call print_string
+    
+    ; Читаем первое число
+    call read_line
+    mov si, input_buffer
+    call string_to_number
+    mov [calc_num1], ax
+    
+    ; Читаем оператор
+    mov si, calc_operator_msg
+    call print_string
+    call read_line
+    mov al, [input_buffer]
+    mov [calc_op], al
+    
+    ; Читаем второе число
+    mov si, calc_num2_msg
+    call print_string
+    call read_line
+    mov si, input_buffer
+    call string_to_number
+    mov [calc_num2], ax
+    
+    ; Выполняем операцию
+    mov ax, [calc_num1]
+    mov bx, [calc_num2]
+    mov cl, [calc_op]
+    
+    cmp cl, '+'
+    je .add
+    cmp cl, '-'
+    je .sub
+    cmp cl, '*'
+    je .mul
+    cmp cl, '/'
+    je .div
+    
+    ; Неизвестная операция
+    mov si, calc_error_msg
+    call print_string
+    jmp main_loop
+    
+.add:
+    add ax, bx
+    jmp .show_result
+    
+.sub:
+    sub ax, bx
+    jmp .show_result
+    
+.mul:
+    mul bx
+    jmp .show_result
+    
+.div:
+    cmp bx, 0
+    je .div_zero
+    xor dx, dx
+    div bx
+    jmp .show_result
+    
+.div_zero:
+    mov si, calc_div_zero_msg
+    call print_string
+    jmp main_loop
+    
+.show_result:
+    mov [calc_result], ax
+    mov si, calc_result_msg
+    call print_string
+    mov ax, [calc_result]
+    call print_number
+    call newline
     jmp main_loop
 
 do_shut:
@@ -209,6 +291,83 @@ do_fastfetch:
     mov si, fastfetch_disabled_msg
     call print_string
     jmp main_loop
+
+
+string_to_number:
+    push bx
+    push cx
+    push dx
+    xor ax, ax
+    xor cx, cx
+.loop:
+    mov cl, [si]
+    cmp cl, 0
+    je .done
+    cmp cl, '0'
+    jb .done
+    cmp cl, '9'
+    ja .done
+    sub cl, '0'
+    mov bx, 10
+    mul bx
+    add ax, cx
+    inc si
+    jmp .loop
+.done:
+    pop dx
+    pop cx
+    pop bx
+    ret
+
+
+print_number:
+    push ax
+    push bx
+    push cx
+    push dx
+    
+    xor cx, cx
+    mov bx, 10
+    
+    cmp ax, 0
+    jge .position
+    neg ax
+    push ax
+    mov al, '-'
+    call print_char
+    pop ax
+    
+.positive:
+    cmp ax, 0
+    jne .convert
+    mov al, '0'
+    call print_char
+    jmp .done
+    
+.convert:
+    cmp ax, 0
+    je .print_digits
+    xor dx, dx
+    div bx
+    push dx
+    inc cx
+    jmp .convert
+    
+.print_digits:
+    cmp cx, 0
+    je .done
+    pop ax
+    add al, '0'
+    call print_char
+    dec cx
+    jmp .print_digits
+    
+.done:
+    pop dx
+    pop cx
+    pop bx
+    pop ax
+    ret
 
 strcmp:
     pusha
@@ -369,11 +528,21 @@ help_msg db '<< help list Axiom v1.2 alpha >>',13,10
          db 'info - shows info about system',13,10
          db 'time - shows current time',13,10
          db 'clear - clear screen',13,10
+         db 'calc - simple calculator',13,10
          db 'reboot - rebooting system',13,10
          db 'ping - pong!',13,10
          db 'shut - shutting down system',13,10
-         db 'opreg -[arg] - manage OS components',13,10,
+         db 'opreg -[arg] - manage OS components',13,10
          db 'more in https://kasked-sys.github.io/axiomdocs/',13,10,0
+
+calc_msg db '=== Axiom Calculator v1 (max 65355) ===',13,10
+         db 'Enter first number: ',0
+calc_operator_msg db 'Enter operator (+, -, *, /): ',0
+calc_num2_msg db 'Enter second number: ',0
+calc_result_msg db 'Result: ',0
+calc_error_msg db 'Error: Unknown operator!',13,10,0
+calc_div_zero_msg db 'Error: Division by zero!',13,10,0
+
 cmd_help   db 'help',0
 cmd_info   db 'info',0
 cmd_time   db 'time',0
@@ -383,6 +552,7 @@ cmd_ping   db 'ping',0
 cmd_shut   db 'shut',0
 cmd_opreg  db 'opreg',0
 cmd_fastfetch db 'fastfetch',0
+cmd_calc db 'calc',0
 
 opreg_help_msg db 'opreg - OS Components Registry',13,10
                db 'Usage: opreg -[arg]',13,10
@@ -416,5 +586,9 @@ tiger_art db '            /\\',13,10
           db '           \\/',13,10,13,10,0
 
 fastfetch_enabled db 0
+calc_num1 dw 0
+calc_num2 dw 0
+calc_op db 0
+calc_result dw 0
 
 input_buffer times 64 db 0
