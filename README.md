@@ -1,4 +1,4 @@
-# KaskedOS
+# Axiom
 
 *A minimalist 16-bit operating system written in x86 assembly*
 
@@ -6,7 +6,7 @@
 
 ## 📋 Overview
 
-KaskedOS is a lightweight, educational operating system developed entirely in x86 assembly language. Designed to run in real mode, it provides a simple command-line interface with essential system utilities and component management capabilities.
+Axiom is a lightweight, educational operating system developed entirely in x86 assembly language. Designed to run in real mode, it provides a simple command-line interface with essential system utilities and component management capabilities.
 
 ### Key Highlights
 
@@ -39,7 +39,7 @@ KaskedOS is a lightweight, educational operating system developed entirely in x8
 
 ### Prerequisites
 
-Before building KaskedOS, ensure you have the following installed:
+Before building Axiom, ensure you have the following installed:
 
 ```bash
 # Update package list
@@ -57,8 +57,8 @@ sudo apt install -y nasm qemu-system-x86
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/kaskedos.git
-   cd kaskedos
+   git clone https://github.com/yourusername/Axiom.git
+   cd Axiom
    ```
 
 2. **Make the build script executable**
@@ -74,22 +74,22 @@ sudo apt install -y nasm qemu-system-x86
 The build script will:
 - Assemble the bootloader (`boot.asm`)
 - Assemble the kernel (`kernel.asm`)
-- Create a bootable disk image (`kaskedos.img`)
+- Create a bootable disk image (`Axiom.img`)
 - Launch QEMU automatically
 
 ---
 
 ## 📖 Usage
 
-### Running KaskedOS
+### Running Axiom
 
-After building, KaskedOS will launch automatically in QEMU. You'll be greeted with:
+After building, Axiom will launch automatically in QEMU. You'll be greeted with:
 
 ```
-=== KaskedOS v1.2 alpha ===
+=== Axiom v1.2 alpha ===
 type help for command list
 
-[fastuser]$kaskedos$ >
+[fastuser]$Axiom$ >
 ```
 
 ### Manual Launch
@@ -97,7 +97,7 @@ type help for command list
 To run the OS manually:
 
 ```bash
-qemu-system-i386 disk/kaskedos.img
+qemu-system-i386 disk/Axiom.img
 ```
 
 ---
@@ -130,14 +130,14 @@ opreg -d       # Disable component
 
 **Example workflow:**
 ```bash
-[fastuser]$kaskedos$ > opreg -r
+[fastuser]$Axiom$ > opreg -r
 OS Components Registry:
 fastfetch: DISABLED
 
-[fastuser]$kaskedos$ > opreg -c
+[fastuser]$Axiom$ > opreg -c
 Component enabled successfully
 
-[fastuser]$kaskedos$ > opreg -r
+[fastuser]$Axiom$ > opreg -r
 OS Components Registry:
 fastfetch: ENABLED
 ```
@@ -147,7 +147,7 @@ fastfetch: ENABLED
 ## 🏗️ Project Structure
 
 ```
-kaskedos/
+Axiom/
 ├── src/
 │   ├── boot.asm       # Bootloader (stage 1)
 │   └── kernel.asm     # Kernel and shell implementation
@@ -155,7 +155,7 @@ kaskedos/
 │   ├── boot.bin       # Compiled bootloader
 │   └── kernel.bin     # Compiled kernel
 ├── disk/
-│   └── kaskedos.img   # Bootable disk image
+│   └── Axiom.img   # Bootable disk image
 ├── build.sh           # Build automation script
 └── README.md          # This file
 ```
