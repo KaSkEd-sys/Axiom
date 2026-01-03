@@ -59,6 +59,11 @@ main_loop:
     cmp ax, 1
     je do_help
 
+    mov di, cmd_beep
+    call strcmp
+    cmp ax, 1
+    je do_beep
+
     mov si, input_buffer
     mov di, cmd_opreg
     call strcmp_prefix
@@ -128,24 +133,58 @@ do_help:
     call print_string
     jmp main_loop
 
+do_beep:
+    mov si, beep_msg
+    call print_string
+    
+    in al, 0x61
+    push ax
+    
+    mov al, 0xB6
+    out 0x43, al
+    
+    mov ax, 1193180 / 1000
+    out 0x42, al
+    mov al, ah
+    out 0x42, al
+    
+    pop ax
+    or al, 0x03
+    out 0x61, al
+    
+    mov cx, 0x3000
+.delay_outer:
+    push cx
+    mov cx, 0x1000
+.delay_inner:
+    nop
+    loop .delay_inner
+    pop cx
+    loop .delay_outer
+    
+    pop ax
+    push ax
+    and al, 0xFC
+    out 0x61, al
+    pop ax
+    
+    jmp main_loop
+
 do_calc:
     mov si, calc_msg
     call print_string
     
-    ; Читаем первое число
     call read_line
     mov si, input_buffer
     call string_to_number
     mov [calc_num1], ax
     
-    ; Читаем оператор
     mov si, calc_operator_msg
     call print_string
     call read_line
     mov al, [input_buffer]
     mov [calc_op], al
     
-    ; Читаем второе число
     mov si, calc_num2_msg
     call print_string
     call read_line
@@ -153,7 +192,6 @@ do_calc:
     call string_to_number
     mov [calc_num2], ax
     
-    ; Выполняем операцию
     mov ax, [calc_num1]
     mov bx, [calc_num2]
     mov cl, [calc_op]
@@ -167,7 +205,6 @@ do_calc:
     cmp cl, '/'
     je .div
     
-    ; Неизвестная операция
     mov si, calc_error_msg
     call print_string
     jmp main_loop
@@ -293,7 +330,6 @@ do_fastfetch:
     call print_string
     jmp main_loop
 
-
 string_to_number:
     push bx
     push cx
@@ -319,7 +355,6 @@ string_to_number:
     pop cx
     pop bx
     ret
-
 
 print_number:
     push ax
@@ -515,7 +550,7 @@ print_hex:
     call print_char
     ret
 
-welcome_msg db '=== Axiom v1.2 alpha ===',13,10
+welcome_msg db '=== Axiom v1.3 alpha ===',13,10
              db 'type help for command list',13,10,13,10,0
 prompt_msg db '[fastuser]$Axiom$ > ',0
 unknown_msg db 'Unknown command',13,10,0
@@ -525,13 +560,15 @@ time_msg db 'Time: ',0
 reboot_msg db 'Rebooting...',13,10,0
 pong_msg db 'pong!',13,10,0
 shut_msg db 'Shutting down Axiom x86',13,10,0
-help_msg db '<< help list Axiom v1.2 alpha >>',13,10
+beep_msg db 'Beep!',13,10,0
+help_msg db '<< help list Axiom v1.3 alpha >>',13,10
          db 'info - shows info about system',13,10
          db 'time - shows current time',13,10
          db 'clear - clear screen',13,10
          db 'calc - simple calculator',13,10
          db 'reboot - rebooting system',13,10
          db 'ping - pong!',13,10
+         db 'beep - make a beep sound',13,10
          db 'shut - shutting down system',13,10
          db 'opreg -[arg] - manage OS components',13,10
          db 'more in https://kasked-sys.github.io/axiomdocs/',13,10,0
@@ -551,6 +588,7 @@ cmd_clear  db 'clear',0
 cmd_reboot db 'reboot',0
 cmd_ping   db 'ping',0
 cmd_shut   db 'shut',0
+cmd_beep   db 'beep',0
 cmd_opreg  db 'opreg',0
 cmd_fastfetch db 'fastfetch',0
 cmd_calc db 'calc',0
@@ -569,22 +607,22 @@ fastfetch_disabled_msg db 'fastfetch is disabled. Use opreg -c to enable',13,10,
 status_enabled db 'ENABLED',13,10,0
 status_disabled db 'DISABLED',13,10,0
 
-tiger_art db '            /\\',13,10
-          db '           /  \\     fastuser@Axiom',13,10
-          db '          / /\\ \\    ---------------------',13,10
-          db '         ( (  ) )   OS: Axiom x86 v1.2 alpha',13,10
-          db '        (  \\  / )   Kernel: 16-bit Real Mode',13,10
-          db '         \\  \\/  /   Architecture: x86',13,10
-          db '          \\    /    Shell: Axiom shell',13,10
-          db '       /\\ |  | /\\   Uptime: Since boot',13,10
-          db '      /  \\|  |/  \\  ',13,10
-          db '     (    \\  /    )',13,10
-          db '      \\    \\/    /',13,10
-          db '       \\        /',13,10
-          db '        \\  __  /',13,10
-          db '         \\(  )/',13,10
-          db '          \\  /',13,10
-          db '           \\/',13,10,13,10,0
+tiger_art db '            /\',13,10
+          db '           /  \     fastuser@Axiom',13,10
+          db '          / /\ \    ---------------------',13,10
+          db '         ( (  ) )   OS: Axiom x86 v1.3 alpha',13,10
+          db '        (  \  / )   Kernel: 16-bit Real Mode',13,10
+          db '         \  \/  /   Architecture: x86',13,10
+          db '          \    /    Shell: Axiom shell',13,10
+          db '       /\ |  | /\   Uptime: Since boot',13,10
+          db '      /  \|  |/  \  ',13,10
+          db '     (    \  /    )',13,10
+          db '      \    \/    /',13,10
+          db '       \        /',13,10
+          db '        \  __  /',13,10
+          db '         \(  )/',13,10
+          db '          \  /',13,10
+          db '           \/',13,10,13,10,0
 
 fastfetch_enabled db 0
 calc_num1 dw 0
