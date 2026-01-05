@@ -64,6 +64,11 @@ main_loop:
     cmp ax, 1
     je do_beep
 
+    mov di, cmd_piano
+    call strcmp
+    cmp ax, 1
+    je do_piano
+
     mov si, input_buffer
     mov di, cmd_opreg
     call strcmp_prefix
@@ -169,6 +174,162 @@ do_beep:
     pop ax
     
     jmp main_loop
+
+do_piano:
+    call clear_screen
+    mov si, piano_title
+    call print_string
+    
+    mov si, piano_help
+    call print_string
+    
+    mov si, piano_keys
+    call print_string
+
+.piano_loop:
+    xor ah, ah
+    int 0x16
+    
+    cmp al, 27
+    je .exit_piano
+    
+    cmp al, 'A'
+    jb .check_lower
+    cmp al, 'Z'
+    ja .check_lower
+    add al, 32
+    
+.check_lower:
+    cmp al, 'a'
+    je .note_c
+    cmp al, 'w'
+    je .note_cs
+    cmp al, 's'
+    je .note_d
+    cmp al, 'e'
+    je .note_ds
+    cmp al, 'd'
+    je .note_e
+    cmp al, 'f'
+    je .note_f
+    cmp al, 't'
+    je .note_fs
+    cmp al, 'g'
+    je .note_g
+    cmp al, 'y'
+    je .note_gs
+    cmp al, 'h'
+    je .note_a
+    cmp al, 'u'
+    je .note_as
+    cmp al, 'j'
+    je .note_b
+    cmp al, 'k'
+    je .note_c2
+    
+    jmp .piano_loop
+
+.note_c:
+    mov ax, 4560
+    call play_note
+    jmp .piano_loop
+.note_cs:
+    mov ax, 4304
+    call play_note
+    jmp .piano_loop
+.note_d:
+    mov ax, 4063
+    call play_note
+    jmp .piano_loop
+.note_ds:
+    mov ax, 3834
+    call play_note
+    jmp .piano_loop
+.note_e:
+    mov ax, 3619
+    call play_note
+    jmp .piano_loop
+.note_f:
+    mov ax, 3416
+    call play_note
+    jmp .piano_loop
+.note_fs:
+    mov ax, 3224
+    call play_note
+    jmp .piano_loop
+.note_g:
+    mov ax, 3043
+    call play_note
+    jmp .piano_loop
+.note_gs:
+    mov ax, 2873
+    call play_note
+    jmp .piano_loop
+.note_a:
+    mov ax, 2711
+    call play_note
+    jmp .piano_loop
+.note_as:
+    mov ax, 2559
+    call play_note
+    jmp .piano_loop
+.note_b:
+    mov ax, 2415
+    call play_note
+    jmp .piano_loop
+.note_c2:
+    mov ax, 2280
+    call play_note
+    jmp .piano_loop
+    
+.exit_piano:
+    call clear_screen
+    mov si, welcome_msg
+    call print_string
+    jmp main_loop
+
+play_note:
+    push ax
+    push bx
+    push cx
+    push dx
+    
+    mov bx, ax
+    
+    in al, 0x61
+    push ax
+    
+    mov al, 0xB6
+    out 0x43, al
+    
+    mov ax, bx
+    out 0x42, al
+    mov al, ah
+    out 0x42, al
+    
+    pop ax
+    or al, 0x03
+    out 0x61, al
+    
+    mov cx, 0x2000
+.delay_outer:
+    push cx
+    mov cx, 0x1000
+.delay_inner:
+    nop
+    loop .delay_inner
+    pop cx
+    loop .delay_outer
+    
+    in al, 0x61
+    and al, 0xFC
+    out 0x61, al
+    
+    pop dx
+    pop cx
+    pop bx
+    pop ax
+    ret
 
 do_calc:
     mov si, calc_msg
@@ -566,6 +727,7 @@ help_msg db '<< help list Axiom v1.3 alpha >>',13,10
          db 'time - shows current time',13,10
          db 'clear - clear screen',13,10
          db 'calc - simple calculator',13,10
+         db 'piano - interactive piano',13,10
          db 'reboot - rebooting system',13,10
          db 'ping - pong!',13,10
          db 'beep - make a beep sound',13,10
@@ -581,6 +743,24 @@ calc_result_msg db 'Result: ',0
 calc_error_msg db 'Error: Unknown operator!',13,10,0
 calc_div_zero_msg db 'Error: Division by zero!',13,10,0
 
+piano_title db '=== Axiom Piano v1.0 ===',13,10,13,10,0
+piano_help db 'Press keys to play notes. ESC to exit.',13,10,13,10,0
+piano_keys db 'Piano Keys:',13,10
+           db '  A = C (Do)    - 262 Hz',13,10
+           db '  W = C# (Do#)  - 277 Hz',13,10
+           db '  S = D (Re)    - 294 Hz',13,10
+           db '  E = D# (Re#)  - 311 Hz',13,10
+           db '  D = E (Mi)    - 330 Hz',13,10
+           db '  F = F (Fa)    - 349 Hz',13,10
+           db '  T = F# (Fa#)  - 370 Hz',13,10
+           db '  G = G (Sol)   - 392 Hz',13,10
+           db '  Y = G# (Sol#) - 415 Hz',13,10
+           db '  H = A (La)    - 440 Hz',13,10
+           db '  U = A# (La#)  - 466 Hz',13,10
+           db '  J = B (Si)    - 494 Hz',13,10
+           db '  K = C2 (Do2)  - 523 Hz',13,10,13,10
+           db 'Ready to play!',13,10,0
+
 cmd_help   db 'help',0
 cmd_info   db 'info',0
 cmd_time   db 'time',0
@@ -592,6 +772,7 @@ cmd_beep   db 'beep',0
 cmd_opreg  db 'opreg',0
 cmd_fastfetch db 'fastfetch',0
 cmd_calc db 'calc',0
+cmd_piano db 'piano',0
 
 opreg_help_msg db 'opreg - OS Components Registry',13,10
                db 'Usage: opreg -[arg]',13,10
