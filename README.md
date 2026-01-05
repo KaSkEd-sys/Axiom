@@ -1,9 +1,8 @@
 # Axiom
 
 *A minimalist 16-bit operating system written in x86 assembly*
-![preview texta](./gitimage/fastfetch.png)
 ---
-
+![preview texta](./gitimage/fastfetch.jpg)
 ## 📋 Overview
 
 Axiom is a lightweight, educational operating system developed entirely in x86 assembly language. Designed to run in real mode, it provides a simple command-line interface with essential system utilities and component management capabilities.
