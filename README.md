@@ -1,7 +1,7 @@
 # Axiom
 
 *A minimalist 16-bit operating system written in x86 assembly*
-
+![preview texta](./gitimage/fastfetch.png)
 ---
 
 ## 📋 Overview
