@@ -711,7 +711,7 @@ print_hex:
     call print_char
     ret
 
-welcome_msg db '=== Axiom v1.3 alpha ===',13,10
+welcome_msg db '=== Axiom v1.4 alpha ===',13,10
              db 'type help for command list',13,10,13,10,0
 prompt_msg db '[fastuser]$Axiom$ > ',0
 unknown_msg db 'Unknown command',13,10,0
