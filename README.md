@@ -56,7 +56,7 @@ sudo apt install -y nasm qemu-system-x86
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/Axiom.git
+   git clone https://github.com/kasked-sys/Axiom.git
    cd Axiom
    ```
 
