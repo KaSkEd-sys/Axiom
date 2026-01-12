@@ -111,7 +111,7 @@ qemu-system-i386 disk/Axiom.img
 | `info` | Show system information |
 | `time` | Display current system time |
 | `clear` | Clear the screen |
-| `ping` | Network diagnostic (responds with "pong!") |
+| `ping` | print the pong!|
 | `reboot` | Restart the system |
 | `shut` | Shutdown the system |
 
