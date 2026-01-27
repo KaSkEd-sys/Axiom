@@ -80,6 +80,21 @@ main_loop:
     cmp ax, 1
     je do_fastfetch
 
+    mov di, cmd_meminfo
+    call strcmp
+    cmp ax, 1
+    je do_meminfo
+
+    mov di, cmd_cpuid
+    call strcmp
+    cmp ax, 1
+    je do_cpuid
+
+    mov di, cmd_disk
+    call strcmp
+    cmp ax, 1
+    je do_disk
+
     mov si, unknown_msg
     call print_string
     jmp main_loop
@@ -491,6 +506,102 @@ do_fastfetch:
     call print_string
     jmp main_loop
 
+do_meminfo:
+    mov si, meminfo_header
+    call print_string
+    
+    int 0x12
+    mov [mem_kb], ax
+    
+    mov si, meminfo_base
+    call print_string
+    mov ax, [mem_kb]
+    call print_number
+    mov si, meminfo_kb
+    call print_string
+    
+    mov si, meminfo_extended
+    call print_string
+    
+    mov ah, 0x88
+    int 0x15
+    mov [mem_extended], ax
+    
+    mov ax, [mem_extended]
+    call print_number
+    mov si, meminfo_kb
+    call print_string
+    
+    mov si, meminfo_total
+    call print_string
+    mov ax, [mem_kb]
+    add ax, [mem_extended]
+    mov bx, 1024
+    mul bx
+    call print_number
+    mov si, meminfo_bytes
+    call print_string
+    
+    call newline
+    jmp main_loop
+
+do_cpuid:
+    mov si, cpuid_header
+    call print_string
+    
+    xor ax, ax
+    cpuid
+    mov si, cpuid_result
+    call print_string
+    
+    call newline
+    jmp main_loop
+
+do_disk:
+    mov si, disk_header
+    call print_string
+    
+    mov dl, 0x80
+    mov ah, 0x08
+    int 0x13
+    
+    mov al, dh
+    inc al
+    mov [disk_heads], al
+    
+    mov al, cl
+    and al, 0x3F
+    mov [disk_sectors], al
+    
+    mov al, ch
+    mov [disk_cylinders_low], al
+    mov al, cl
+    shr al, 6
+    mov [disk_cylinders_high], al
+    
+    mov si, disk_cylinders_msg
+    call print_string
+    mov al, [disk_cylinders_high]
+    call print_hex
+    mov al, [disk_cylinders_low]
+    call print_hex
+    call newline
+    
+    mov si, disk_heads_msg
+    call print_string
+    mov al, [disk_heads]
+    call print_hex
+    call newline
+    
+    mov si, disk_sectors_msg
+    call print_string
+    mov al, [disk_sectors]
+    call print_hex
+    call newline
+    
+    call newline
+    jmp main_loop
+
 string_to_number:
     push bx
     push cx
@@ -716,13 +827,13 @@ welcome_msg db '=== Axiom v1.4 alpha ===',13,10
 prompt_msg db '[fastuser]$Axiom$ > ',0
 unknown_msg db 'Unknown command',13,10,0
 info_msg db '<< Axiom x86 >>',13,10
-         db '16 bit operating system written by kasked',13,10,13,10,0
+         db '16 bit-Real Mode operating system written by kasked-sys',13,10,13,10,0
 time_msg db 'Time: ',0
 reboot_msg db 'Rebooting...',13,10,0
 pong_msg db 'pong!',13,10,0
 shut_msg db 'Shutting down Axiom x86',13,10,0
 beep_msg db 'Beep!',13,10,0
-help_msg db '<< help list Axiom v1.3 alpha >>',13,10
+help_msg db '<< help list Axiom v1.4 alpha >>',13,10
          db 'info - shows info about system',13,10
          db 'time - shows current time',13,10
          db 'clear - clear screen',13,10
@@ -732,6 +843,9 @@ help_msg db '<< help list Axiom v1.3 alpha >>',13,10
          db 'ping - pong!',13,10
          db 'beep - make a beep sound',13,10
          db 'shut - shutting down system',13,10
+         db 'meminfo - system memory info',13,10
+         db 'cpuid - CPU information',13,10
+         db 'disk - disk information',13,10
          db 'opreg -[arg] - manage OS components',13,10
          db 'more in https://kasked-sys.github.io/axiomdocs/',13,10,0
 
@@ -773,6 +887,9 @@ cmd_opreg  db 'opreg',0
 cmd_fastfetch db 'fastfetch',0
 cmd_calc db 'calc',0
 cmd_piano db 'piano',0
+cmd_meminfo db 'meminfo',0
+cmd_cpuid db 'cpuid',0
+cmd_disk db 'disk',0
 
 opreg_help_msg db 'opreg - OS Components Registry',13,10
                db 'Usage: opreg -[arg]',13,10
@@ -810,5 +927,27 @@ calc_num1 dw 0
 calc_num2 dw 0
 calc_op db 0
 calc_result dw 0
+mem_kb dw 0
+mem_extended dw 0
+disk_heads db 0
+disk_sectors db 0
+disk_cylinders_low db 0
+disk_cylinders_high db 0
+
+meminfo_header db '=== System Memory Information ===',13,10,0
+meminfo_base db 'Base Memory: ',0
+meminfo_kb db ' KB',13,10,0
+meminfo_extended db 'Extended Memory: ',0
+meminfo_total db 'Total Memory: ',0
+meminfo_bytes db ' bytes',13,10,0
+
+cpuid_header db '=== CPU Information ===',13,10
+             db 'CPUID Instruction: Available',13,10,13,10,0
+cpuid_result db 'Unable to display CPU details in real mode',13,10,0
+
+disk_header db '=== Disk Information ===',13,10,0
+disk_cylinders_msg db 'Cylinders: 0x',0
+disk_heads_msg db 'Heads: 0x',0
+disk_sectors_msg db 'Sectors: 0x',0
 
 input_buffer times 64 db 0
